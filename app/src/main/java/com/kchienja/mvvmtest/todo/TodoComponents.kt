@@ -24,13 +24,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -195,8 +189,9 @@ fun TodoInputText(
     onImeAction: () -> Unit = {}
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    TextField(
+    OutlinedTextField(
         value = text,
+        label = { Text("Add Todo Item") },
         onValueChange = onTextChange,
         colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
         maxLines = 1,
@@ -224,7 +219,7 @@ fun TodoEditButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
-    TextButton(
+    Button(
         onClick = onClick,
         shape = CircleShape,
         enabled = enabled,
