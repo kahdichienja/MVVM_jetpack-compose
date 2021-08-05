@@ -15,6 +15,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -22,6 +23,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kchienja.mvvmtest.util.generateRandomTodoItem
 import kotlin.random.Random
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.focus.focusModifier
 
 /**
  * Stateless component that is responsible for the entire todo screen.
@@ -37,6 +42,9 @@ fun TodoScreen(
     onRemoveItem: (TodoItem) -> Unit
 ) {
     Column {
+        TodoItemInputBackground(elevate = true, modifier = Modifier.fillMaxWidth()) {
+            TodoItemInput(onItemComplete = onAddItem)
+        }
         LazyColumn(
             modifier = Modifier.weight(1f),
             contentPadding = PaddingValues(top = 8.dp)
@@ -70,7 +78,12 @@ fun TodoScreen(
  * @param modifier modifier for this element
  */
 @Composable
-fun TodoRow(todo: TodoItem, onItemClicked: (TodoItem) -> Unit, modifier: Modifier = Modifier) {
+fun TodoRow(
+    todo: TodoItem,
+    onItemClicked: (TodoItem) -> Unit,
+    modifier: Modifier = Modifier,
+    iconAlpha : Float = remember(todo.id) { randomTint() }
+) {
     Row(
         modifier = modifier
             .clickable { onItemClicked(todo) }
@@ -78,7 +91,6 @@ fun TodoRow(todo: TodoItem, onItemClicked: (TodoItem) -> Unit, modifier: Modifie
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(todo.task)
-        val iconAlpha : Float = remember(todo.id) { randomTint() }
         Icon(
             imageVector = todo.icon.imageVector,
             tint = LocalContentColor.current.copy(alpha = iconAlpha),
@@ -90,8 +102,46 @@ fun TodoRow(todo: TodoItem, onItemClicked: (TodoItem) -> Unit, modifier: Modifie
 private fun randomTint(): Float {
     return Random.nextFloat().coerceIn(0.3f, 0.9f)
 }
+@Composable
+fun TodoInputTextField(text: String, onTextChange: (String) -> Unit,modifier: Modifier){
 
-@Preview
+    TodoInputText(text, onTextChange,modifier )
+}
+@Composable
+fun TodoItemInput(onItemComplete: (TodoItem) -> Unit){
+    // onItemComplete is an event will fire when an item is completed by the user
+    val (text, setText) = remember { mutableStateOf("")}
+    Column {
+        Row( modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .padding(top = 16.dp)) {
+            TodoInputTextField(
+                text =text,
+                onTextChange = setText,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp),
+            )
+            TodoEditButton(
+                onClick = {
+                    onItemComplete(TodoItem(text))
+                    setText("")
+                },
+                modifier = Modifier.align(Alignment.CenterVertically),
+                text = "Add",
+                enabled = text.isNotBlank()
+
+            )
+        }
+
+
+
+    }
+
+
+}
+
+//@Preview
 @Composable
 fun PreviewTodoScreen() {
     val items = listOf(
@@ -103,9 +153,12 @@ fun PreviewTodoScreen() {
     TodoScreen(items, {}, {})
 }
 
-@Preview
+//@Preview
 @Composable
 fun PreviewTodoRow() {
     val todo = remember { generateRandomTodoItem() }
     TodoRow(todo = todo, onItemClicked = {}, modifier = Modifier.fillMaxWidth())
 }
+@Preview
+@Composable
+fun PreviewTodoItemInput() = TodoItemInput(onItemComplete = { })
