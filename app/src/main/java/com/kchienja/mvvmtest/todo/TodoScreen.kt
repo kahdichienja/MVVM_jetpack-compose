@@ -1,10 +1,13 @@
 package com.kchienja.mvvmtest.todo
 
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -18,8 +21,14 @@ import kotlin.random.Random
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.focusModifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import com.kchienja.mvvmtest.ui.theme.ButtonBlue
+import com.kchienja.mvvmtest.ui.theme.LightRed
+import com.kchienja.mvvmtest.ui.theme.OrangeYellow1
+import com.kchienja.mvvmtest.ui.theme.TextWhite
 
 /**
  * Stateless component that is responsible for the entire todo screen.
@@ -46,21 +55,21 @@ fun TodoScreen(
 
         val enableTopSection = currentlyEditing == null
         TodoItemInputBackground(elevate = enableTopSection) {
-            if (enableTopSection){
-                TodoItemEntryInput(onItemComplete = onAddItem)
-            }else{
+            if(!enableTopSection)
+            {
                 Text(
                     "Editing item",
                     style = MaterialTheme.typography.h6,
                     textAlign = TextAlign.Center,
+                    color = TextWhite,
                     modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .padding(16.dp)
-                        .fillMaxWidth()
+                            .align(Alignment.CenterVertically)
+                            .padding(16.dp)
+                            .fillMaxWidth()
                 )
-
             }
         }
+
 
         LazyColumn(
             modifier = Modifier.weight(1f),
@@ -77,7 +86,7 @@ fun TodoScreen(
                     )
 
                 }else{
-                    TodoRow(
+                    ElevatedTodoRow(
                         todo,
                         { onStartEdit(it) },
                         Modifier.fillParentMaxWidth()
@@ -88,15 +97,21 @@ fun TodoScreen(
             }
         }
 
+        TodoItemInputBackground(elevate = enableTopSection) {
+            if (enableTopSection){
+                TodoItemEntryInput(onItemComplete = onAddItem)
+            }
+        }
+
         // For quick testing, a random item generator button
-//        Button(
-//            onClick = { onAddItem(generateRandomTodoItem()) },
-//            modifier = Modifier
-//                .padding(16.dp)
-//                .fillMaxWidth(),
-//        ) {
-//            Text("Add random item")
-//        }
+        Button(
+            onClick = { onAddItem(generateRandomTodoItem()) },
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+        ) {
+            Text("Add random item")
+        }
     }
 }
 
@@ -126,6 +141,61 @@ fun TodoRow(
             tint = LocalContentColor.current.copy(alpha = iconAlpha),
             contentDescription = stringResource(id = todo.icon.contentDescription)
         )
+    }
+}
+/**
+ * Stateless composable that displays a full-width [TodoItem].
+ *
+ * @param todo item to show
+ * @param onItemClicked (event) notify caller that the row was clicked
+ * @param modifier modifier for this element
+ * @param color color for this element
+ */
+@Composable
+fun ElevatedTodoRow(
+    todo: TodoItem,
+    onItemClicked: (TodoItem) -> Unit,
+    modifier: Modifier = Modifier,
+    iconAlpha : Float = remember(todo.id) { randomTint() },
+    color: Color = LightRed
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = modifier
+            .clickable { onItemClicked(todo) }
+            .padding(15.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .background(color)
+            .padding(horizontal = 15.dp, vertical = 20.dp)
+            .fillMaxWidth()
+    ) {
+        Column {
+            Text(
+                text = todo.task,
+                style = MaterialTheme.typography.h2
+            )
+            Text(
+                text = "Meditation • 3-10 min",
+                style = MaterialTheme.typography.body1,
+                color = TextWhite
+            )
+        }
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(ButtonBlue)
+                .padding(10.dp)
+        ) {
+            Icon(
+                imageVector = todo.icon.imageVector,
+                tint = LocalContentColor.current.copy(alpha = iconAlpha),
+                contentDescription = stringResource(id = todo.icon.contentDescription),
+                modifier = Modifier.size(16.dp)
+            )
+        }
     }
 }
 
