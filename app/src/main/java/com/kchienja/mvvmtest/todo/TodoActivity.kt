@@ -38,19 +38,26 @@ fun TodoActivityNavigationEntryScreen(navController: NavController) {
 
 @Composable
 fun TodoActivityScreen(todoViewModel: TodoViewModel){
-    val items: List<TodoItem> by todoViewModel.todoItems.observeAsState(listOf())
+//    val items: List<TodoItem> by todoViewModel.todoItems.observeAsState(listOf())
 
     TodoScreen(
-        items = items,
-        onAddItem = //todoViewModel::addItem,
-        {
-            todoItem -> todoViewModel.addItem(todoItem)
-        },
-        onRemoveItem ={
-
-            todoItem -> todoViewModel.removeItem(todoItem)
-        }
+        items = todoViewModel.todoItems,
+        onAddItem = todoViewModel::addItem,
+        onRemoveItem = todoViewModel::removeItem
     )
+
+
+//    TodoScreen(
+//        items = items,
+//        onAddItem = //todoViewModel::addItem,
+//        {
+//            todoItem -> todoViewModel.addItem(todoItem)
+//        },
+//        onRemoveItem ={
+//
+//            todoItem -> todoViewModel.removeItem(todoItem)
+//        }
+//    )
 
 
 }
