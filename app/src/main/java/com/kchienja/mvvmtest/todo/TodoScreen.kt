@@ -5,10 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.focus.focusModifier
+import androidx.compose.ui.text.style.TextAlign
 
 /**
  * Stateless component that is responsible for the entire todo screen.
@@ -40,9 +38,28 @@ fun TodoScreen(
     onEditItemChange: (TodoItem) -> Unit,
     onEditDone: () -> Unit,
 ) {
+
     Column {
-        TodoItemInputBackground(elevate = true, modifier = Modifier.fillMaxWidth()) {
-            TodoItemEntryInput(onItemComplete = onAddItem)
+//        TodoItemInputBackground(elevate = true, modifier = Modifier.fillMaxWidth()) {
+//            TodoItemEntryInput(onItemComplete = onAddItem)
+//        }
+
+        val enableTopSection = currentlyEditing == null
+        TodoItemInputBackground(elevate = enableTopSection) {
+            if (enableTopSection){
+                TodoItemEntryInput(onItemComplete = onAddItem)
+            }else{
+                Text(
+                    "Editing item",
+                    style = MaterialTheme.typography.h6,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                )
+
+            }
         }
 
         LazyColumn(
@@ -72,14 +89,14 @@ fun TodoScreen(
         }
 
         // For quick testing, a random item generator button
-        Button(
-            onClick = { onAddItem(generateRandomTodoItem()) },
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-        ) {
-            Text("Add random item")
-        }
+//        Button(
+//            onClick = { onAddItem(generateRandomTodoItem()) },
+//            modifier = Modifier
+//                .padding(16.dp)
+//                .fillMaxWidth(),
+//        ) {
+//            Text("Add random item")
+//        }
     }
 }
 
