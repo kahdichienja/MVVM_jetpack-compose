@@ -2,7 +2,17 @@ package com.kchienja.mvvmtest.util
 
 import com.kchienja.mvvmtest.todo.TodoIcon
 import com.kchienja.mvvmtest.todo.TodoItem
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
+fun getCurrentDate(): String {
+    val currentDate = LocalDateTime.now()
+    val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
+    val formatted = currentDate.format(formatter)
+
+    return formatted
+}
 
 fun generateRandomTodoItem(): TodoItem {
     val message = listOf(
@@ -17,7 +27,8 @@ fun generateRandomTodoItem(): TodoItem {
         "Use state from stateless composables"
     ).random()
     val icon = TodoIcon.values().random()
-    return TodoItem(message, icon)
+    val time = getCurrentDate()
+    return TodoItem(message, time ,icon)
 }
 
 fun main() {

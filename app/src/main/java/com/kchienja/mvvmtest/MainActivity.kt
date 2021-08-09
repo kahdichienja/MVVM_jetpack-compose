@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.kchienja.mvvmtest.AppNavigator.AppNavigator
 import com.kchienja.mvvmtest.todo.TodoActivityScreen
 import com.kchienja.mvvmtest.todo.TodoViewModel
@@ -41,11 +42,14 @@ class MainActivity : ComponentActivity() {
     val todoViewModel by viewModels<TodoViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
+            val navController = rememberNavController()
+
             Surface(color = MaterialTheme.colors.background) {
                 MVVMTestTheme {
-                // AppNavigator()
-                    TodoActivityScreen(todoViewModel)
+                 AppNavigator()
+//                    TodoActivityScreen(todoViewModel)
                 }
             }
         }

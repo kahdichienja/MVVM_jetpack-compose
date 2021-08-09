@@ -1,6 +1,7 @@
 package com.kchienja.mvvmtest.todo
 
 
+import android.app.Application
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -13,7 +14,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.kchienja.mvvmtest.Database.TodoDataClassViewModel
+import com.kchienja.mvvmtest.Database.TodoDataClassViewModelFactory
 import com.kchienja.mvvmtest.ui.theme.DeepBlue
 import com.kchienja.mvvmtest.ui.theme.MVVMTestTheme
 
@@ -36,19 +41,19 @@ class TodoActivity : AppCompatActivity() {
 
 @Composable
 fun TodoActivityNavigationEntryScreen(navController: NavController) {
-
+    TodoDataClassMainScreen(navController = navController)
 }
 
 
 
 @Composable
-fun TodoActivityScreen(todoViewModel: TodoViewModel){
+fun TodoActivityScreen(todoViewModel: TodoViewModel) {
 //    val items: List<TodoItem> by todoViewModel.todoItems.observeAsState(listOf())
     Box(
         modifier = Modifier
             .background(DeepBlue)
             .fillMaxSize()
-    ){
+    ) {
         TodoScreen(
             items = todoViewModel.todoItems,
             currentlyEditing = todoViewModel.currentEditItem,
@@ -59,9 +64,7 @@ fun TodoActivityScreen(todoViewModel: TodoViewModel){
             onEditDone = todoViewModel::onEditDone,
         )
     }
-
-
-//    TodoScreen(
+    //    TodoScreen(
 //        items = items,
 //        onAddItem = //todoViewModel::addItem,
 //        {
@@ -72,6 +75,32 @@ fun TodoActivityScreen(todoViewModel: TodoViewModel){
 //            todoItem -> todoViewModel.removeItem(todoItem)
 //        }
 //    )
-
-
 }
+@Composable
+fun TodoDataClassMainScreen(navController: NavController){
+
+    val context = LocalContext.current
+    val mTodoViewModel: TodoDataClassViewModel = viewModel(
+        factory = TodoDataClassViewModelFactory(context.applicationContext as Application)
+    )
+    val items = mTodoViewModel.readAllData.observeAsState(listOf()).value
+        Box(
+            modifier = Modifier
+                .background(DeepBlue)
+                .fillMaxSize()
+        ){
+            TodoDataClassScreen(
+                items = items,
+//                currentlyEditing = todoViewModel.currentEditItem,
+                onAddItem = { todoItem -> mTodoViewModel.addTodo(todoItem) },
+                onRemoveItem = {todoItem -> mTodoViewModel.deleteTodo(todoItem) },
+                onStartEdit = {todoItem -> mTodoViewModel.onEditItemSelected(todoItem) }//todoViewModel::onEditItemSelected,
+//                onEditItemChange = todoViewModel::onEditItemChange,
+//                onEditDone = todoViewModel::onEditDone,
+            )
+        }
+    }
+
+
+
+

@@ -25,11 +25,41 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import com.kchienja.mvvmtest.Database.TodoItemDataClass
 import com.kchienja.mvvmtest.ui.theme.ButtonBlue
 import com.kchienja.mvvmtest.ui.theme.LightRed
 import com.kchienja.mvvmtest.ui.theme.OrangeYellow1
 import com.kchienja.mvvmtest.ui.theme.TextWhite
+import com.kchienja.mvvmtest.util.getCurrentDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
+
+@Composable
+fun TodoDataClassScreen(
+    items: List<TodoItemDataClass>,
+//    currentlyEditing: TodoItemDataClass?,
+    onAddItem: (TodoItemDataClass) -> Unit,
+    onRemoveItem: (TodoItemDataClass) -> Unit,
+    onStartEdit: (TodoItemDataClass) -> Unit,
+//    onEditItemChange: (TodoItemDataClass) -> Unit,
+//    onEditDone: () -> Unit,
+) {
+    Column {
+        TodoItemInputBackground(elevate = true, modifier = Modifier.fillMaxWidth()) {
+            TodoItemDataClassEntryInput(onItemComplete = onAddItem)
+        }
+    LazyColumn(
+        modifier = Modifier.weight(1f),
+        contentPadding = PaddingValues(top = 8.dp)
+    ) {
+        items(items) { todo ->
+            ElevatedTodoDataClassRow(todo,{ onStartEdit(it) },Modifier.fillParentMaxWidth(),)
+            }
+        }
+    }
+}
 /**
  * Stateless component that is responsible for the entire todo screen.
  *
@@ -47,6 +77,11 @@ fun TodoScreen(
     onEditItemChange: (TodoItem) -> Unit,
     onEditDone: () -> Unit,
 ) {
+//    val currentDate = LocalDateTime.now()
+//    val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
+//    val formatted = currentDate.format(formatter)
+
+
 
     Column {
 //        TodoItemInputBackground(elevate = true, modifier = Modifier.fillMaxWidth()) {
@@ -89,7 +124,7 @@ fun TodoScreen(
                     ElevatedTodoRow(
                         todo,
                         { onStartEdit(it) },
-                        Modifier.fillParentMaxWidth()
+                        Modifier.fillParentMaxWidth(),
                     )
 
 
@@ -157,7 +192,7 @@ fun ElevatedTodoRow(
     onItemClicked: (TodoItem) -> Unit,
     modifier: Modifier = Modifier,
     iconAlpha : Float = remember(todo.id) { randomTint() },
-    color: Color = LightRed
+    color: Color = LightRed,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -176,7 +211,7 @@ fun ElevatedTodoRow(
                 style = MaterialTheme.typography.h2
             )
             Text(
-                text = "Meditation • 3-10 min",
+                text = "Start Time • ${todo.time}",
                 style = MaterialTheme.typography.body1,
                 color = TextWhite
             )
@@ -245,10 +280,11 @@ fun TodoInputTextField(text: String, onTextChange: (String) -> Unit,modifier: Mo
 fun TodoItemEntryInput(onItemComplete: (TodoItem) -> Unit) {
     val (text, onTextChange) = remember { mutableStateOf("") }
     val (icon, onIconChange) = remember { mutableStateOf(TodoIcon.Default)}
+    val time = getCurrentDate()
 
     val submit = {
         if (text.isNotBlank()) {
-            onItemComplete(TodoItem(text, icon))
+            onItemComplete(TodoItem(text,time, icon))
             onTextChange("")
             onIconChange(TodoIcon.Default)
         }
@@ -313,11 +349,12 @@ fun TodoItemInput(
 @Preview
 @Composable
 fun PreviewTodoScreen() {
+    val time = getCurrentDate()
     val items = listOf(
-        TodoItem("Learn compose", TodoIcon.Event),
-        TodoItem("Take the code lab"),
-        TodoItem("Apply state", TodoIcon.Done),
-        TodoItem("Build dynamic UIs", TodoIcon.Square)
+        TodoItem("Learn compose", time, TodoIcon.Event),
+        TodoItem("Take the code lab", time),
+        TodoItem("Apply state",time, TodoIcon.Done),
+        TodoItem("Build dynamic UIs", time, TodoIcon.Square)
     )
     TodoScreen(items, null, {}, {}, {}, {}, {})
 }
@@ -331,3 +368,85 @@ fun PreviewTodoRow() {
 //@Preview
 //@Composable
 //fun PreviewTodoItemInput() = TodoItemInput(onItemComplete = { })
+
+
+
+
+////////////////////////////////////////////////////////////////////////////
+//TodoDataClass
+
+@Composable
+fun TodoItemDataClassEntryInput(onItemComplete: (TodoItemDataClass) -> Unit) {
+    val (text, onTextChange) = remember { mutableStateOf("") }
+    val (icon, onIconChange) = remember { mutableStateOf(TodoIcon.Default)}
+    val time = getCurrentDate()
+
+    val rnds = (0..10).random()
+
+
+    val submit = {
+        if (text.isNotBlank()) {
+            onItemComplete(TodoItemDataClass(itemName = text, isDone = false))
+            onTextChange("")
+            onIconChange(TodoIcon.Default)
+        }
+    }
+    TodoItemInput(
+        text = text,
+        onTextChange = onTextChange,
+        icon = icon,
+        onIconChange = onIconChange,
+        submit = submit,
+        iconsVisible = text.isNotBlank()
+    ) {
+        TodoEditButton(onClick = submit, text = "Add", enabled = text.isNotBlank())
+    }
+}
+
+@Composable
+fun ElevatedTodoDataClassRow(
+    todo: TodoItemDataClass,
+    onItemClicked: (TodoItemDataClass) -> Unit,
+    modifier: Modifier = Modifier,
+    iconAlpha : Float = remember(todo.itemId) { randomTint() },
+    color: Color = LightRed,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = modifier
+            .clickable { onItemClicked(todo) }
+            .padding(15.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .background(color)
+            .padding(horizontal = 15.dp, vertical = 20.dp)
+            .fillMaxWidth()
+    ) {
+        Column {
+            Text(
+                text = todo.itemName,
+                style = MaterialTheme.typography.h2
+            )
+            Text(
+                text = "Start Time • " /*${todo.time}*/,
+                style = MaterialTheme.typography.body1,
+                color = TextWhite
+            )
+        }
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(ButtonBlue)
+                .padding(10.dp)
+        ) {
+//            Icon(
+//                imageVector = todo.icon.imageVector,
+//                tint = LocalContentColor.current.copy(alpha = iconAlpha),
+//                contentDescription = stringResource(id = todo.icon.contentDescription),
+//                modifier = Modifier.size(16.dp)
+//            )
+        }
+    }
+}

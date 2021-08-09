@@ -14,8 +14,8 @@ import com.kchienja.mvvmtest.todo.TodoActivityNavigationEntryScreen
 fun AppNavigator() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = NavigationScreens.TodoScreen.route){
-        composable(route = NavigationScreens.TodoScreen.route){
+    NavHost(navController = navController, startDestination = NavigationScreens.TodoDataClassScreen.route){
+        composable(route = NavigationScreens.TodoDataClassScreen.route){
             TodoActivityNavigationEntryScreen(navController = navController)
         }
 
