@@ -39,23 +39,55 @@ import java.time.format.FormatStyle
 @Composable
 fun TodoDataClassScreen(
     items: List<TodoItemDataClass>,
-//    currentlyEditing: TodoItemDataClass?,
+    currentlyEditing: TodoItemDataClass?,
     onAddItem: (TodoItemDataClass) -> Unit,
     onRemoveItem: (TodoItemDataClass) -> Unit,
     onStartEdit: (TodoItemDataClass) -> Unit,
-//    onEditItemChange: (TodoItemDataClass) -> Unit,
-//    onEditDone: () -> Unit,
+    onEditItemChange: (TodoItemDataClass) -> Unit,
+    onEditDone: () -> Unit,
 ) {
     Column {
-        TodoItemInputBackground(elevate = true, modifier = Modifier.fillMaxWidth()) {
-            TodoItemDataClassEntryInput(onItemComplete = onAddItem)
+        val enableTopSection = currentlyEditing == null
+        TodoItemInputBackground(elevate = enableTopSection) {
+            if(!enableTopSection)
+            {
+                Text(
+                    "Editing item",
+                    style = MaterialTheme.typography.h6,
+                    textAlign = TextAlign.Center,
+                    color = TextWhite,
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                )
+            }
         }
+        TodoItemInputBackground(elevate = enableTopSection) {
+            if (enableTopSection){
+                TodoItemDataClassEntryInput(onItemComplete = onAddItem)
+            }
+        }
+
     LazyColumn(
         modifier = Modifier.weight(1f),
         contentPadding = PaddingValues(top = 8.dp)
     ) {
         items(items) { todo ->
-            ElevatedTodoDataClassRow(todo,{ onStartEdit(it) },Modifier.fillParentMaxWidth(),)
+//            ElevatedTodoDataClassRow(todo,{ onStartEdit(it) },Modifier.fillParentMaxWidth(),)
+            if (currentlyEditing?.itemId == todo.itemId){
+                TodoItemInlineDataClassEditor(
+                    item = currentlyEditing,
+                    onEditItemChange = onEditItemChange,
+                    onEditDone = onEditDone,
+                    onRemoveItem = { onRemoveItem(todo) }
+                )
+
+            }else{
+                ElevatedTodoDataClassRow(todo,{ onStartEdit(it) },Modifier.fillParentMaxWidth(),)
+
+
+            }
             }
         }
     }
@@ -449,4 +481,82 @@ fun ElevatedTodoDataClassRow(
 //            )
         }
     }
+}
+
+@Composable
+fun TodoItemInlineDataClassEditor(
+    item: TodoItemDataClass,
+    onEditItemChange: (TodoItemDataClass) -> Unit,
+    onEditDone: () -> Unit,
+    onRemoveItem: () -> Unit
+) = TodoItemDataClassInput(
+    text = item.itemName,
+    onTextChange = { onEditItemChange(item.copy(itemName = it)) },
+//    icon = item.icon,
+//    onIconChange = { onEditItemChange(item.copy(icon = it)) },
+    submit = onEditDone,
+    iconsVisible = true,
+    buttonSlot = {
+        Row {
+            val shrinkButtons = Modifier.widthIn(20.dp)
+            TextButton(onClick = onEditDone, modifier = shrinkButtons) {
+                Text(
+                    text = "\uD83D\uDCBE", // floppy disk
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.width(30.dp)
+                )
+            }
+            TextButton(onClick = onRemoveItem, modifier = shrinkButtons) {
+                Text(
+                    text = "❌",
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.width(30.dp)
+                )
+            }
+        }
+    }
+)
+
+@Composable
+fun TodoItemDataClassInput(
+    text: String,
+    onTextChange: (String) -> Unit,
+//    icon: TodoIcon,
+//    onIconChange: (TodoIcon) -> Unit,
+    submit: () -> Unit,
+    iconsVisible: Boolean,
+    buttonSlot: @Composable () ->   Unit
+
+) {
+    Column {
+        Row(
+            Modifier
+                .padding(horizontal = 16.dp)
+                .padding(top = 16.dp)
+        ) {
+            TodoInputText(
+                text,
+                onTextChange,
+                Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp),
+                submit
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Box(Modifier.align(Alignment.CenterVertically)) { buttonSlot() }
+
+//            TodoEditButton(
+//                onClick = submit,
+//                text = "Add",
+//                modifier = Modifier.align(Alignment.CenterVertically),
+//                enabled = text.isNotBlank()
+//            )
+        }
+        if (iconsVisible) {
+//            AnimatedIconRow(icon, onIconChange, Modifier.padding(top = 8.dp))
+        } else {
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+
 }

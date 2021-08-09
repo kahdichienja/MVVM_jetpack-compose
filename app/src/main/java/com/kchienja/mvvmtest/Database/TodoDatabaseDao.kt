@@ -22,6 +22,6 @@ interface TodoDatabaseDao {
     @Delete
     suspend fun delete(item: TodoItemDataClass)
 
-//    @Delete
-//    suspend fun deleteAllTodos()
+    @Query("DELETE FROM my_todo_list")
+    suspend fun deleteAllTodos()
 }

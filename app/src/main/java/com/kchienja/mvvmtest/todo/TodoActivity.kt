@@ -91,12 +91,12 @@ fun TodoDataClassMainScreen(navController: NavController){
         ){
             TodoDataClassScreen(
                 items = items,
-//                currentlyEditing = todoViewModel.currentEditItem,
+                currentlyEditing =  mTodoViewModel.currentEditItem,// todoViewModel.currentEditItem,
                 onAddItem = { todoItem -> mTodoViewModel.addTodo(todoItem) },
                 onRemoveItem = {todoItem -> mTodoViewModel.deleteTodo(todoItem) },
-                onStartEdit = {todoItem -> mTodoViewModel.onEditItemSelected(todoItem) }//todoViewModel::onEditItemSelected,
-//                onEditItemChange = todoViewModel::onEditItemChange,
-//                onEditDone = todoViewModel::onEditDone,
+                onStartEdit = {todoItem -> mTodoViewModel.onEditItemSelected(todoItem) },//todoViewModel::onEditItemSelected,
+                onEditItemChange = {todoItem -> mTodoViewModel.onEditItemChange(todoItem) },//todoViewModel::onEditItemChange,
+                onEditDone ={ mTodoViewModel.onEditDone() }// todoViewModel::onEditDone,
             )
         }
     }
