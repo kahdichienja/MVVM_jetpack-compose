@@ -1,12 +1,15 @@
 package com.kchienja.mvvmtest.AppNavigator
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
 import com.kchienja.mvvmtest.DetailedViwPage
+import com.kchienja.mvvmtest.SplashScreen
 import com.kchienja.mvvmtest.todo.TodoActivityNavigationEntryScreen
 
 
@@ -14,14 +17,16 @@ import com.kchienja.mvvmtest.todo.TodoActivityNavigationEntryScreen
 fun AppNavigator() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = NavigationScreens.TodoDataClassScreen.route){
-        composable(route = NavigationScreens.TodoDataClassScreen.route){
-            TodoActivityNavigationEntryScreen(navController = navController)
+    NavHost(navController = navController, startDestination = NavigationScreens.SplashScreen.route){
+        composable(route = NavigationScreens.SplashScreen.route){
+            SplashScreen(navController = navController)
         }
-
 
         composable(route = NavigationScreens.MainScreen.route){
             DetailedViwPage(navController = navController)
+        }
+        composable(route = NavigationScreens.TodoDataClassScreen.route){
+            TodoActivityNavigationEntryScreen(navController = navController)
         }
 
         composable(

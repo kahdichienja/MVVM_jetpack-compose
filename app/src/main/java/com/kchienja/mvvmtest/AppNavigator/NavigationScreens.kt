@@ -1,6 +1,7 @@
 package com.kchienja.mvvmtest.AppNavigator
 
 sealed class NavigationScreens(val route: String) {
+    object SplashScreen : NavigationScreens("splash_screen")
     object TodoScreen : NavigationScreens("todo_screen")
     object TodoDataClassScreen : NavigationScreens("todo-data_class_screen")
     object MainScreen : NavigationScreens("main_screen")
